@@ -13,6 +13,7 @@ from config import VECTOR_STORE_CONFIG
 
 logger = logging.getLogger(__name__)
 
+
 class IndexManager:
     """Manager for vector index operations like backup and optimization."""
     

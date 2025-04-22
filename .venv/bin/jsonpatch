@@ -1,4 +1,4 @@
-#!/home/arnabdey/vs/intent-based-search/.venv/bin/python3
+#!/Users/arnabdey/PycharmProjects/intent-based-search/.venv/bin/python
 # -*- coding: utf-8 -*-
 
 import sys

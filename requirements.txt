@@ -1,8 +1,12 @@
 # Core dependencies
 langchain>=0.0.267
 langgraph>=0.0.15
+
 openai>=1.0.0
 langchain_openai>=0.0.5
+
+google-generativeai
+langchain-google-genai
 
 # Vector database
 faiss-cpu>=1.7.4

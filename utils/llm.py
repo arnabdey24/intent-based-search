@@ -1,7 +1,7 @@
 """
 LLM setup and utility functions.
 """
-from langchain_openai import ChatOpenAI, OpenAIEmbeddings
+from langchain_google_genai import ChatGoogleGenerativeAI, GoogleGenerativeAIEmbeddings
 from langchain_core.prompts import ChatPromptTemplate
 from typing import Dict, Any
 import logging
@@ -10,15 +10,15 @@ from config import LLM_CONFIG, EMBEDDING_CONFIG
 
 logger = logging.getLogger(__name__)
 
-def get_llm() -> ChatOpenAI:
+def get_llm() -> ChatGoogleGenerativeAI:
     """
     Initialize and return the LLM instance.
     
     Returns:
-        ChatOpenAI: Configured LLM instance
+        ChatGoogleGenerativeAI: Configured LLM instance
     """
     try:
-        llm = ChatOpenAI(
+        llm = ChatGoogleGenerativeAI(
             model=LLM_CONFIG["model"],
             temperature=LLM_CONFIG["temperature"],
             api_key=LLM_CONFIG["api_key"]
@@ -28,17 +28,17 @@ def get_llm() -> ChatOpenAI:
         logger.error(f"Failed to initialize LLM: {str(e)}")
         raise
 
-def get_embeddings() -> OpenAIEmbeddings:
+def get_embeddings() -> GoogleGenerativeAIEmbeddings:
     """
     Initialize and return the embeddings model.
     
     Returns:
-        OpenAIEmbeddings: Configured embeddings instance
+        GoogleGenerativeAIEmbeddings: Configured embeddings instance
     """
     try:
-        embeddings = OpenAIEmbeddings(
+        embeddings = GoogleGenerativeAIEmbeddings(
             model=EMBEDDING_CONFIG["model"],
-            api_key=EMBEDDING_CONFIG["api_key"]
+            google_api_key=EMBEDDING_CONFIG["api_key"]
         )
         return embeddings
     except Exception as e:

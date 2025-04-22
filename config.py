@@ -60,15 +60,15 @@ elif VECTOR_DB_TYPE == "milvus":
 
 # LLM configuration
 LLM_CONFIG = {
-    "model": os.environ.get("LLM_MODEL", "gpt-4"),
+    "model": os.environ.get("LLM_MODEL", "gemini-2.0-flash-exp"),
     "temperature": float(os.environ.get("LLM_TEMPERATURE", "0.1")),
-    "api_key": os.environ.get("OPENAI_API_KEY", "")
+    "api_key": os.environ.get("LLM_API_KEY", "")
 }
 
 # Embedding configuration
 EMBEDDING_CONFIG = {
-    "model": os.environ.get("EMBEDDING_MODEL", "text-embedding-3-large"),
-    "api_key": os.environ.get("OPENAI_API_KEY", "")
+    "model": os.environ.get("EMBEDDING_MODEL", "models/embedding-001"),
+    "api_key": os.environ.get("LLM_API_KEY", "")
 }
 
 # Vector store configuration

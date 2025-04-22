@@ -124,3 +124,23 @@ class EmbeddingGenerator:
 
 # Singleton instance
 embedding_generator = EmbeddingGenerator()
+
+
+if __name__ == '__main__':
+
+    # Example usage
+    product = {
+        "id": "123",
+        "name": "Sample Product",
+        "description": "This is a sample product description.",
+        "category": "Electronics",
+        "brand": "BrandX",
+        "price": 99.99,
+        "attributes": {
+            "color": ["red", "blue"],
+            "size": "M"
+        }
+    }
+
+    embedding = embedding_generator.generate_product_embedding(product)
+    print("Generated embedding:", embedding)
