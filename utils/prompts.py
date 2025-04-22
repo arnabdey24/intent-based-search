@@ -33,7 +33,7 @@ PARAMETER_EXTRACTION_PROMPT = ChatPromptTemplate.from_messages([
     - problems: List of problems user wants to solve with product
     - comparison_items: List of items being compared
     
-    Return ONLY valid JSON, no other text."""),
+    Return ONLY valid JSON, no other text. No ```json or code blocks."""),
     ("human", "{query}")
 ])
 

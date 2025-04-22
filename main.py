@@ -38,6 +38,7 @@ def initialize_system():
         "config": config
     }
 
+
 def execute_search(query: str, conversation_history: Optional[List[Dict[str, str]]] = None):
     """
     Execute a search with the given query.
@@ -195,6 +196,7 @@ def execute_conversation_search(query: str, conversation_context: Dict[str, Any]
         result["conversation_history"] = conversation_history + [new_history_entry]
     
     return result
+
 
 if __name__ == "__main__":
     # Initialize the system

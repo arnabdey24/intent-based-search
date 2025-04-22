@@ -35,6 +35,10 @@ def extract_parameters(state: SearchState) -> SearchState:
             "query": query, 
             "intent": intent
         }).content
+
+        # if start with ```json and end with ```, remove it
+        if params_text.startswith("```json") and params_text.endswith("```"):
+            params_text = params_text[7:-3].strip()
         
         logger.debug(f"Raw parameter extraction result: {params_text}")
         

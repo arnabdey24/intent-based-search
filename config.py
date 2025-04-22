@@ -60,7 +60,7 @@ elif VECTOR_DB_TYPE == "milvus":
 
 # LLM configuration
 LLM_CONFIG = {
-    "model": os.environ.get("LLM_MODEL", "gemini-2.0-flash-exp"),
+    "model": os.environ.get("LLM_MODEL", "gemini-2.0-flash-lite"),
     "temperature": float(os.environ.get("LLM_TEMPERATURE", "0.1")),
     "api_key": os.environ.get("LLM_API_KEY", "")
 }
