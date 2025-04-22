@@ -1,0 +1,236 @@
+[
+    {
+      "id": "p1001",
+      "name": "Nike Air Zoom Pegasus 38",
+      "description": "The Nike Air Zoom Pegasus 38 delivers a responsive running experience with breathable mesh and Zoom Air cushioning.",
+      "price": 120.99,
+      "category": "footwear",
+      "brand": "Nike",
+      "in_stock": true,
+      "attributes": {
+        "color": ["black", "white", "blue"],
+        "size": [8, 9, 10, 11, 12],
+        "features": ["cushioned", "breathable", "lightweight"],
+        "gender": "unisex",
+        "material": "mesh"
+      }
+    },
+    {
+      "id": "p1002",
+      "name": "Adidas Ultraboost 22",
+      "description": "Run with ultimate energy return. These Adidas running shoes feature a responsive Boost midsole and a Primeknit upper for a supportive fit.",
+      "price": 189.99,
+      "category": "footwear",
+      "brand": "Adidas",
+      "in_stock": true,
+      "attributes": {
+        "color": ["grey", "black", "red"],
+        "size": [7, 8, 9, 10, 11, 12],
+        "features": ["boost cushioning", "responsive", "durable"],
+        "gender": "unisex",
+        "material": "primeknit"
+      }
+    },
+    {
+      "id": "p1003",
+      "name": "Brooks Ghost 14",
+      "description": "The Brooks Ghost 14 offers a smooth, stable ride with soft cushioning. Perfect for road running and everyday use.",
+      "price": 129.95,
+      "category": "footwear",
+      "brand": "Brooks",
+      "in_stock": true,
+      "attributes": {
+        "color": ["blue", "black", "grey"],
+        "size": [8, 9, 10, 11, 12],
+        "features": ["neutral support", "cushioned", "road running"],
+        "gender": "unisex",
+        "material": "mesh"
+      }
+    },
+    {
+      "id": "p1004",
+      "name": "New Balance FuelCell Rebel v2",
+      "description": "Lightweight and propulsive, the FuelCell Rebel v2 is designed for runners looking for a responsive ride during speed workouts.",
+      "price": 129.99,
+      "category": "footwear",
+      "brand": "New Balance",
+      "in_stock": false,
+      "attributes": {
+        "color": ["green", "grey"],
+        "size": [8, 9, 10],
+        "features": ["lightweight", "responsive", "speed"],
+        "gender": "unisex",
+        "material": "synthetic"
+      }
+    },
+    {
+      "id": "p1005",
+      "name": "Nike Dri-FIT Running T-Shirt",
+      "description": "This lightweight Nike Dri-FIT running t-shirt helps keep you dry and comfortable during your run.",
+      "price": 35.00,
+      "category": "clothing",
+      "brand": "Nike",
+      "in_stock": true,
+      "attributes": {
+        "color": ["black", "blue", "red", "white"],
+        "size": ["S", "M", "L", "XL", "XXL"],
+        "features": ["moisture-wicking", "breathable", "lightweight"],
+        "gender": "unisex",
+        "material": "polyester"
+      }
+    },
+    {
+      "id": "p1006",
+      "name": "Adidas Run It 3-Stripes T-Shirt",
+      "description": "This Adidas running t-shirt features 3-Stripes design and AEROREADY technology to keep you dry as you clock up the miles.",
+      "price": 30.00,
+      "category": "clothing",
+      "brand": "Adidas",
+      "in_stock": true,
+      "attributes": {
+        "color": ["blue", "black", "white"],
+        "size": ["S", "M", "L", "XL"],
+        "features": ["AEROREADY", "regular fit", "crew neck"],
+        "gender": "men",
+        "material": "recycled polyester"
+      }
+    },
+    {
+      "id": "p1007",
+      "name": "Lululemon Fast and Free Tight 25\"",
+      "description": "These lightweight running tights are designed to give you freedom to move with zero distractions.",
+      "price": 128.00,
+      "category": "clothing",
+      "brand": "Lululemon",
+      "in_stock": true,
+      "attributes": {
+        "color": ["black", "navy", "grey"],
+        "size": ["2", "4", "6", "8", "10", "12"],
+        "features": ["high waisted", "quick-drying", "side pockets"],
+        "gender": "women",
+        "material": "nulux"
+      }
+    },
+    {
+      "id": "p1008",
+      "name": "Nike Phenom Elite Running Pants",
+      "description": "The Nike Phenom Elite Running Pants combine sweat-wicking technology with breathable design to help keep you cool and comfortable.",
+      "price": 90.00,
+      "category": "clothing",
+      "brand": "Nike",
+      "in_stock": true,
+      "attributes": {
+        "color": ["black", "grey"],
+        "size": ["S", "M", "L", "XL"],
+        "features": ["Dri-FIT technology", "reflective elements", "zippered pockets"],
+        "gender": "men",
+        "material": "polyester"
+      }
+    },
+    {
+      "id": "p1009",
+      "name": "Garmin Forerunner 255",
+      "description": "Advanced running smartwatch with comprehensive training features, detailed metrics and long battery life.",
+      "price": 349.99,
+      "category": "accessories",
+      "brand": "Garmin",
+      "in_stock": true,
+      "attributes": {
+        "color": ["black", "white", "blue"],
+        "features": ["GPS", "heart rate monitor", "PacePro", "sleep tracking"],
+        "battery_life": "14 days (smartwatch mode), 30 hours (GPS mode)",
+        "water_resistance": "5 ATM"
+      }
+    },
+    {
+      "id": "p1010",
+      "name": "Apple Watch Ultra",
+      "description": "Rugged and capable smartwatch designed for endurance athletes and outdoor adventurers.",
+      "price": 799.00,
+      "category": "accessories",
+      "brand": "Apple",
+      "in_stock": true,
+      "attributes": {
+        "color": ["orange", "green", "white"],
+        "features": ["GPS + Cellular", "heart rate monitor", "altitude", "water temperature"],
+        "battery_life": "36 hours",
+        "water_resistance": "100m"
+      }
+    },
+    {
+      "id": "p1011",
+      "name": "Nathan SpeedDraw Plus Insulated Flask",
+      "description": "Insulated handheld water bottle with phone storage pocket. Perfect for keeping hydrated during runs.",
+      "price": 42.00,
+      "category": "accessories",
+      "brand": "Nathan",
+      "in_stock": true,
+      "attributes": {
+        "color": ["black", "blue"],
+        "capacity": "18 oz",
+        "features": ["insulated", "phone pocket", "adjustable strap"]
+      }
+    },
+    {
+      "id": "p1012",
+      "name": "Aftershokz Aeropex Bone Conduction Headphones",
+      "description": "Open-ear bone conduction headphones designed for runners to stay aware of surroundings while listening to music.",
+      "price": 159.95,
+      "category": "accessories",
+      "brand": "Aftershokz",
+      "in_stock": true,
+      "attributes": {
+        "color": ["black", "blue", "red"],
+        "features": ["bone conduction", "waterproof", "8-hour battery"],
+        "connectivity": "Bluetooth 5.0"
+      }
+    },
+    {
+      "id": "p1013",
+      "name": "Brooks Glycerin 20",
+      "description": "The Brooks Glycerin 20 delivers supreme softness and a plush fit designed for maximum comfort on every run.",
+      "price": 159.95,
+      "category": "footwear",
+      "brand": "Brooks",
+      "in_stock": true,
+      "attributes": {
+        "color": ["black", "blue", "grey"],
+        "size": [7, 8, 9, 10, 11, 12],
+        "features": ["max cushioning", "neutral support", "DNA Loft v3"],
+        "gender": "unisex",
+        "material": "engineered mesh"
+      }
+    },
+    {
+      "id": "p1014",
+      "name": "Nike Vaporfly Next% 2",
+      "description": "Racing shoe designed for speed with a carbon fiber plate and ZoomX foam for incredible energy return.",
+      "price": 250.00,
+      "category": "footwear",
+      "brand": "Nike",
+      "in_stock": false,
+      "attributes": {
+        "color": ["bright crimson", "black"],
+        "size": [8, 9, 10, 11],
+        "features": ["carbon plate", "ZoomX foam", "racing"],
+        "gender": "unisex",
+        "material": "Vaporweave"
+      }
+    },
+    {
+      "id": "p1015",
+      "name": "Under Armour HOVR Phantom 2",
+      "description": "UA HOVR technology provides 'zero gravity feel' to maintain energy return and eliminate impact during your run.",
+      "price": 150.00,
+      "category": "footwear",
+      "brand": "Under Armour",
+      "in_stock": true,
+      "attributes": {
+        "color": ["black", "grey", "red"],
+        "size": [7, 8, 9, 10, 11, 12],
+        "features": ["HOVR technology", "connected", "cushioned"],
+        "gender": "unisex",
+        "material": "breathable mesh"
+      }
+    }
+  ]

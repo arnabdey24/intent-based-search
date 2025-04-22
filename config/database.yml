@@ -1,0 +1,30 @@
+development:
+  adapter: postgresql
+  encoding: unicode
+  database: intent_search_dev
+  host: localhost
+  port: 5432
+  username: postgres
+  password: password
+  pool: 5
+
+test:
+  adapter: postgresql
+  encoding: unicode
+  database: intent_search_test
+  host: localhost
+  port: 5432
+  username: postgres
+  password: password
+  pool: 5
+
+production:
+  adapter: postgresql
+  encoding: unicode
+  database: intent_search_prod
+  host: <%= ENV['DB_HOST'] %>
+  port: <%= ENV['DB_PORT'] || 5432 %>
+  username: <%= ENV['DB_USER'] %>
+  password: <%= ENV['DB_PASSWORD'] %>
+  pool: <%= ENV['DB_POOL'] || 10 %>
+  ssl_mode: require
