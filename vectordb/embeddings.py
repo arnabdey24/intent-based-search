@@ -9,6 +9,7 @@ from utils.llm import get_embeddings
 
 logger = logging.getLogger(__name__)
 
+
 class EmbeddingGenerator:
     """Generator for creating embeddings from product data."""
     
@@ -39,7 +40,7 @@ class EmbeddingGenerator:
         except Exception as e:
             logger.error(f"Error generating embedding: {str(e)}")
             # Return zero vector as fallback (in production, handle this better)
-            return np.zeros(1536)  # Default embedding dimension
+            return np.zeros(768)  # Default embedding dimension
     
     def generate_bulk_embeddings(self, products: List[Dict[str, Any]]) -> List[np.ndarray]:
         """
@@ -63,7 +64,7 @@ class EmbeddingGenerator:
         except Exception as e:
             logger.error(f"Error generating bulk embeddings: {str(e)}")
             # Return zero vectors as fallback
-            return [np.zeros(1536) for _ in products]
+            return [np.zeros(768) for _ in products]
     
     def generate_query_embedding(self, query: str) -> np.ndarray:
         """
@@ -83,7 +84,7 @@ class EmbeddingGenerator:
         except Exception as e:
             logger.error(f"Error generating query embedding: {str(e)}")
             # Return zero vector as fallback
-            return np.zeros(1536)
+            return np.zeros(768)
     
     def _create_product_text(self, product: Dict[str, Any]) -> str:
         """

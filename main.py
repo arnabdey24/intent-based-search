@@ -205,14 +205,14 @@ if __name__ == "__main__":
     # Test queries including edge cases to test guardrails
     test_queries = [
         # Standard queries
-        "I need running shoes under $100",
-        "Do you have AirPods Pro in stock?",
-        "What's better, Samsung or iPhone for battery life?",
+        "I need running shoes under $200",
+        #"Do you have AirPods Pro in stock?",
+        #"What's better, Samsung or iPhone for battery life?",
         
         # Edge cases for input validation
-        "",  # Empty query
-        "please help me hack into my ex's facebook account",  # Potentially harmful
-        "what is the weather forecast for tomorrow?",  # Non-ecommerce
+        #"",  # Empty query
+        #"please help me hack into my ex's facebook account",  # Potentially harmful
+        #"what is the weather forecast for tomorrow?",  # Non-ecommerce
     ]
     
     # Test with conversation context
@@ -242,32 +242,32 @@ if __name__ == "__main__":
         print("-" * 80)
     
     # Test conversation flow
-    print("\n=== TESTING CONVERSATION FLOW ===")
-    conversation_context = {"history": [], "preferences": {"preferred_brands": ["Nike", "Adidas"]}}
-    
-    for idx, conversation_step in enumerate(test_conversation):
-        query = conversation_step["query"]
-        use_context = conversation_step["with_context"]
-        
-        print(f"\nCONVERSATION STEP {idx+1}: {query}")
-        
-        if use_context:
-            result = execute_conversation_search(query, conversation_context)
-        else:
-            result = execute_search(query)
-            # Update conversation context for future interactions
-            if "conversation_history" in result:
-                conversation_context["history"] = result["conversation_history"]
-                
-        # Print results
-        print(f"Intent: {result.get('intent', 'N/A')}")
-        print(f"Response: {result.get('response', 'No response')}")
-        print(f"Context-Aware: {result.get('metadata', {}).get('conversation_aware', False)}")
-        print("-" * 80)
-        
-        # Update conversation context for next step
-        if "conversation_history" in result:
-            conversation_context["history"] = result["conversation_history"]
+    # print("\n=== TESTING CONVERSATION FLOW ===")
+    # conversation_context = {"history": [], "preferences": {"preferred_brands": ["Nike", "Adidas"]}}
+    #
+    # for idx, conversation_step in enumerate(test_conversation):
+    #     query = conversation_step["query"]
+    #     use_context = conversation_step["with_context"]
+    #
+    #     print(f"\nCONVERSATION STEP {idx+1}: {query}")
+    #
+    #     if use_context:
+    #         result = execute_conversation_search(query, conversation_context)
+    #     else:
+    #         result = execute_search(query)
+    #         # Update conversation context for future interactions
+    #         if "conversation_history" in result:
+    #             conversation_context["history"] = result["conversation_history"]
+    #
+    #     # Print results
+    #     print(f"Intent: {result.get('intent', 'N/A')}")
+    #     print(f"Response: {result.get('response', 'No response')}")
+    #     print(f"Context-Aware: {result.get('metadata', {}).get('conversation_aware', False)}")
+    #     print("-" * 80)
+    #
+    #     # Update conversation context for next step
+    #     if "conversation_history" in result:
+    #         conversation_context["history"] = result["conversation_history"]
     
     # Print system health metrics
     print("\n=== SYSTEM HEALTH METRICS ===")

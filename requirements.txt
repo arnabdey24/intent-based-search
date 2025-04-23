@@ -11,6 +11,8 @@ langchain-google-genai
 # Vector database
 faiss-cpu>=1.7.4
 langchain_community>=0.0.10
+qdrant-client>=1.7.0
+
 
 # Data validation
 pydantic>=2.4.0

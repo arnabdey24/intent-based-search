@@ -38,11 +38,11 @@ REDIS_CONFIG = {
 # Vector database configuration
 VECTOR_DB_TYPE = os.environ.get("VECTOR_DB_TYPE", "faiss")
 
-# Use the existing vector store config with added options
+# Vector store config
 VECTOR_STORE_CONFIG = {
     "type": VECTOR_DB_TYPE,
     "index_name": os.environ.get("VECTOR_STORE_INDEX", "products"),
-    "dimension": int(os.environ.get("VECTOR_DIMENSION", "1536")),
+    "dimension": int(os.environ.get("VECTOR_DIMENSION", "768")),
     "metric": os.environ.get("VECTOR_METRIC", "cosine")
 }
 
@@ -51,6 +51,13 @@ if VECTOR_DB_TYPE == "pinecone":
     VECTOR_STORE_CONFIG.update({
         "api_key": os.environ.get("PINECONE_API_KEY", ""),
         "environment": os.environ.get("PINECONE_ENVIRONMENT", "")
+    })
+elif VECTOR_DB_TYPE == "qdrant":
+    VECTOR_STORE_CONFIG.update({
+        "url": os.environ.get("QDRANT_URL", "http://localhost:6333"),
+        "api_key": os.environ.get("QDRANT_API_KEY", ""),
+        "collection_name": os.environ.get("QDRANT_COLLECTION", "products"),
+        "dimension": int(os.environ.get("VECTOR_DIMENSION", "768")),
     })
 elif VECTOR_DB_TYPE == "milvus":
     VECTOR_STORE_CONFIG.update({
@@ -69,14 +76,6 @@ LLM_CONFIG = {
 EMBEDDING_CONFIG = {
     "model": os.environ.get("EMBEDDING_MODEL", "models/embedding-001"),
     "api_key": os.environ.get("LLM_API_KEY", "")
-}
-
-# Vector store configuration
-VECTOR_STORE_CONFIG = {
-    "type": os.environ.get("VECTOR_STORE_TYPE", "faiss"),  # faiss, pinecone, etc.
-    "index_name": os.environ.get("VECTOR_STORE_INDEX", "products"),
-    "dimension": int(os.environ.get("VECTOR_DIMENSION", "1536")),
-    "metric": os.environ.get("VECTOR_METRIC", "cosine")
 }
 
 # Application configuration

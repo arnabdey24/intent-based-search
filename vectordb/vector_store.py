@@ -1,77 +1,95 @@
 """
-Vector store implementation for semantic search.
+Vector store implementation using Qdrant for semantic search.
 """
-import os
 import logging
-from typing import List, Dict, Any, Tuple, Optional
+from typing import List, Dict, Any, Tuple, Optional, Union
+import uuid
 
-import faiss
-from langchain_community.docstore import InMemoryDocstore
-from langchain_community.vectorstores import FAISS
+from qdrant_client import QdrantClient
+from qdrant_client.http import models as qdrant_models
 import numpy as np
 
 from config import VECTOR_STORE_CONFIG
 from utils.llm import get_embeddings
+from vectordb.embeddings import EmbeddingGenerator
 
 logger = logging.getLogger(__name__)
 
 
 class VectorStore:
     """
-    Vector store for semantic product search.
+    Vector store for semantic product search using Qdrant.
     """
 
-    def __init__(self, index_name: Optional[str] = None):
+    def __init__(self, collection_name: Optional[str] = None):
         """
-        Initialize the vector store.
+        Initialize the Qdrant vector store.
 
         Args:
-            index_name: Optional custom index name
+            collection_name: Optional custom collection name
         """
         self.embeddings = get_embeddings()
-        self.index_name = index_name or VECTOR_STORE_CONFIG["index_name"]
-        self.vector_store = None
-        self.index_path = f"data/indexes/{self.index_name}"
+        self.embedding_generator = EmbeddingGenerator()
+        self.collection_name = collection_name or VECTOR_STORE_CONFIG.get("collection_name", "products")
+        self.dimension = VECTOR_STORE_CONFIG.get("dimension", 768)
 
-        # Try to load existing index or create new one
-        self._load_or_create_index()
+        # Initialize Qdrant client
+        self.client = QdrantClient(
+            url=VECTOR_STORE_CONFIG.get("url", "http://localhost:6333"),
+            api_key=VECTOR_STORE_CONFIG.get("api_key", "")
+        )
 
-    def _load_or_create_index(self):
-        """Load an existing FAISS index or create a new one."""
+        # Initialize collection if it doesn't exist
+        self._init_collection()
+
+    def _init_collection(self):
+        """Initialize the Qdrant collection if it doesn't exist."""
         try:
-            if os.path.exists(os.path.join(self.index_path, "index.faiss")):
-                logger.info(f"Loading vector store from {self.index_path}")
-                self.vector_store = FAISS.load_local(self.index_path, self.embeddings, allow_dangerous_deserialization=True)
-            else:
-                logger.info("Creating new vector store")
-                self.vector_store = FAISS(
-                    embedding_function=self.embeddings,
-                    index=faiss.IndexFlatL2(len(self.embeddings.embed_query("Test"))),
-                    docstore=InMemoryDocstore(),
-                    index_to_docstore_id={}
+            # Check if collection exists
+            collections = self.client.get_collections().collections
+            collection_names = [collection.name for collection in collections]
+
+            if self.collection_name not in collection_names:
+                logger.info(f"Creating new Qdrant collection: {self.collection_name}")
+
+                # Create a new collection
+                self.client.create_collection(
+                    collection_name=self.collection_name,
+                    vectors_config=qdrant_models.VectorParams(
+                        size=self.dimension,
+                        distance=qdrant_models.Distance.COSINE
+                    )
                 )
-                self._save_index()
-        except Exception as e:
-            logger.error(f"Error initializing vector store: {str(e)}")
-            # fallback to empty in-memory store
-            self.vector_store = FAISS(
-                embedding_function=self.embeddings,
-                index=faiss.IndexFlatL2(len(self.embeddings.embed_query("Test"))),
-                docstore=InMemoryDocstore(),
-                index_to_docstore_id={}
-            )
 
-    def _save_index(self):
-        """Save the FAISS index and metadata to disk using LangChain's save_local."""
-        try:
-            if self.vector_store:
-                os.makedirs(self.index_path, exist_ok=True)
-                self.vector_store.save_local(self.index_path)
-                logger.info(f"Saved vector store to {self.index_path}")
+                # Create schema with payload indexing
+                self.client.create_payload_index(
+                    collection_name=self.collection_name,
+                    field_name="category",
+                    field_schema=qdrant_models.PayloadSchemaType.KEYWORD
+                )
+                self.client.create_payload_index(
+                    collection_name=self.collection_name,
+                    field_name="brand",
+                    field_schema=qdrant_models.PayloadSchemaType.KEYWORD
+                )
+                self.client.create_payload_index(
+                    collection_name=self.collection_name,
+                    field_name="price",
+                    field_schema=qdrant_models.PayloadSchemaType.FLOAT
+                )
+                self.client.create_payload_index(
+                    collection_name=self.collection_name,
+                    field_name="in_stock",
+                    field_schema=qdrant_models.PayloadSchemaType.BOOL
+                )
+
+                logger.info(f"Created Qdrant collection: {self.collection_name}")
             else:
-                logger.warning("Vector store is None. Skipping save.")
+                logger.info(f"Using existing Qdrant collection: {self.collection_name}")
+
         except Exception as e:
-            logger.error(f"Failed to save vector store: {str(e)}")
+            logger.error(f"Error initializing Qdrant collection: {str(e)}")
+            raise
 
     def add_products(self, products: List[Dict[str, Any]]):
         """
@@ -81,56 +99,137 @@ class VectorStore:
             products: List of product dictionaries
         """
         try:
-            texts = []
-            metadatas = []
+            points = []
 
             for product in products:
-                text = f"{product.get('name', '')} {product.get('description', '')} "
+                # Generate embedding
+                embedding = self.embedding_generator.generate_product_embedding(product)
 
-                if 'attributes' in product:
-                    for attr_name, attr_values in product['attributes'].items():
-                        if isinstance(attr_values, list):
-                            attr_text = ' '.join(map(str, attr_values))
-                        else:
-                            attr_text = str(attr_values)
-                        text += f"{attr_name}: {attr_text} "
+                # Create point ID (use existing ID or generate a new one)
+                point_id = product.get('id')
+                if not point_id:
+                    point_id = str(uuid.uuid4())
+                    product['id'] = point_id
 
-                texts.append(text)
-                metadatas.append(product)
+                # Convert string ID to UUID if needed
+                if isinstance(point_id, str):
+                    try:
+                        uuid.UUID(point_id)
+                    except ValueError:
+                        # If not a valid UUID, create a deterministic UUID from the string
+                        point_id = str(uuid.uuid5(uuid.NAMESPACE_DNS, point_id))
 
-            self.vector_store.add_texts(texts, metadatas=metadatas)
-            logger.info(f"Added {len(products)} products to vector store")
+                # Create Qdrant point
+                points.append(
+                    qdrant_models.PointStruct(
+                        id=point_id,
+                        vector=embedding,
+                        payload=product
+                    )
+                )
 
-            self._save_index()
+            # Add points to collection
+            self.client.upsert(
+                collection_name=self.collection_name,
+                points=points
+            )
+
+            logger.info(f"Added {len(products)} products to Qdrant collection")
 
         except Exception as e:
-            logger.error(f"Error adding products to vector store: {str(e)}")
+            logger.error(f"Error adding products to Qdrant: {str(e)}")
             raise
 
-    def search(self, query: str, k: int = 10) -> List[Tuple[Dict[str, Any], float]]:
+    def search(self, query: str, k: int = 10, filters: Optional[Dict[str, Any]] = None) -> List[Tuple[Dict[str, Any], float]]:
         """
         Search the vector store for products matching the query.
 
         Args:
             query: The search query
             k: Number of results to return
+            filters: Optional filters to apply to results
 
         Returns:
             List of (product, score) tuples
         """
         try:
-            results = self.vector_store.similarity_search_with_score(query, k=k)
+            # Generate query embedding
+            query_embedding = self.embedding_generator.generate_query_embedding(query)
 
-            formatted_results = []
-            for doc, score in results:
-                product = doc.metadata
-                formatted_results.append((product, float(score)))
+            # Create filter if specified
+            filter_query = None
+            if filters:
+                filter_conditions = []
 
-            logger.info(f"Found {len(formatted_results)} results for query: {query}")
-            return formatted_results
+                if 'category' in filters:
+                    filter_conditions.append(
+                        qdrant_models.FieldCondition(
+                            key="category",
+                            match=qdrant_models.MatchValue(value=filters['category'])
+                        )
+                    )
+
+                if 'brand' in filters:
+                    filter_conditions.append(
+                        qdrant_models.FieldCondition(
+                            key="brand",
+                            match=qdrant_models.MatchValue(value=filters['brand'])
+                        )
+                    )
+
+                if 'price_min' in filters:
+                    filter_conditions.append(
+                        qdrant_models.FieldCondition(
+                            key="price",
+                            range=qdrant_models.Range(
+                                gte=filters['price_min']
+                            )
+                        )
+                    )
+
+                if 'price_max' in filters:
+                    filter_conditions.append(
+                        qdrant_models.FieldCondition(
+                            key="price",
+                            range=qdrant_models.Range(
+                                lte=filters['price_max']
+                            )
+                        )
+                    )
+
+                if 'in_stock' in filters:
+                    filter_conditions.append(
+                        qdrant_models.FieldCondition(
+                            key="in_stock",
+                            match=qdrant_models.MatchValue(value=filters['in_stock'])
+                        )
+                    )
+
+                if filter_conditions:
+                    filter_query = qdrant_models.Filter(
+                        must=filter_conditions
+                    )
+
+            # Search
+            search_result = self.client.search(
+                collection_name=self.collection_name,
+                query_vector=query_embedding,
+                limit=k,
+                query_filter=filter_query
+            )
+
+            # Format results
+            results = []
+            for scored_point in search_result:
+                product = scored_point.payload
+                score = scored_point.score
+                results.append((product, score))
+
+            logger.info(f"Found {len(results)} results for query: {query}")
+            return results
 
         except Exception as e:
-            logger.error(f"Error searching vector store: {str(e)}")
+            logger.error(f"Error searching Qdrant: {str(e)}")
             return []
 
     def update_product(self, product_id: str, updated_product: Dict[str, Any]):
@@ -138,18 +237,42 @@ class VectorStore:
         Update a product in the vector store.
 
         Args:
-            product_id: ID of the product to update
+            product_id: ID of product to update
             updated_product: Updated product data
         """
         try:
-            all_products = self._get_all_products()
-            filtered_products = [p for p in all_products if p.get('id') != product_id]
-            filtered_products.append(updated_product)
-            self._rebuild_index(filtered_products)
-            logger.info(f"Updated product {product_id} in vector store")
+            # Generate embedding
+            embedding = self.embedding_generator.generate_product_embedding(updated_product)
+
+            # Ensure product_id is in updated_product
+            updated_product['id'] = product_id
+
+            # Convert string ID to UUID if needed
+            if isinstance(product_id, str):
+                try:
+                    point_id = uuid.UUID(product_id)
+                except ValueError:
+                    # If not a valid UUID, create a deterministic UUID from the string
+                    point_id = uuid.uuid5(uuid.NAMESPACE_DNS, product_id)
+            else:
+                point_id = product_id
+
+            # Update point in collection
+            self.client.upsert(
+                collection_name=self.collection_name,
+                points=[
+                    qdrant_models.PointStruct(
+                        id=point_id,
+                        vector=embedding,
+                        payload=updated_product
+                    )
+                ]
+            )
+
+            logger.info(f"Updated product {product_id} in Qdrant")
 
         except Exception as e:
-            logger.error(f"Error updating product in vector store: {str(e)}")
+            logger.error(f"Error updating product in Qdrant: {str(e)}")
             raise
 
     def delete_product(self, product_id: str):
@@ -157,67 +280,66 @@ class VectorStore:
         Delete a product from the vector store.
 
         Args:
-            product_id: ID of the product to delete
+            product_id: ID of product to delete
         """
         try:
-            all_products = self._get_all_products()
-            filtered_products = [p for p in all_products if p.get('id') != product_id]
-            self._rebuild_index(filtered_products)
-            logger.info(f"Deleted product {product_id} from vector store")
+            # Convert string ID to UUID if needed
+            if isinstance(product_id, str):
+                try:
+                    point_id = uuid.UUID(product_id)
+                except ValueError:
+                    # If not a valid UUID, create a deterministic UUID from the string
+                    point_id = uuid.uuid5(uuid.NAMESPACE_DNS, product_id)
+            else:
+                point_id = product_id
+
+            # Delete point from collection
+            self.client.delete(
+                collection_name=self.collection_name,
+                points_selector=qdrant_models.PointIdsList(
+                    points=[point_id]
+                )
+            )
+
+            logger.info(f"Deleted product {product_id} from Qdrant")
 
         except Exception as e:
-            logger.error(f"Error deleting product from vector store: {str(e)}")
+            logger.error(f"Error deleting product from Qdrant: {str(e)}")
             raise
 
-    def _get_all_products(self) -> List[Dict[str, Any]]:
+    def get_count(self) -> int:
         """
-        Get all products from the vector store.
+        Get the number of products in the vector store.
 
         Returns:
-            List of all product dictionaries
+            Number of products
         """
-        products = []
-        for doc_id in self.vector_store.docstore._dict:
-            doc = self.vector_store.docstore.search(doc_id)
-            if hasattr(doc, 'metadata'):
-                products.append(doc.metadata)
+        try:
+            collection_info = self.client.get_collection(
+                collection_name=self.collection_name
+            )
+            return collection_info.vectors_count
 
-        return products
+        except Exception as e:
+            logger.error(f"Error getting count from Qdrant: {str(e)}")
+            return 0
 
-    def _rebuild_index(self, products: List[Dict[str, Any]]):
-        """
-        Rebuild the index with the given products.
 
-        Args:
-            products: List of product dictionaries to include in the index
-        """
-        self.vector_store = FAISS(
-            embedding_function=self.embeddings,
-            index=faiss.IndexFlatL2(len(self.embeddings.embed_query("Test"))),
-            docstore=InMemoryDocstore(),
-            index_to_docstore_id={}
-        )
-
-        self.add_products(products)
-
+# Singleton instance
+vector_store = VectorStore()
 
 if __name__ == '__main__':
     # Example usage
-    vector_store = VectorStore()
+    product = {
+        "id": "9a077fe9-5360-4b25-b7bf-1d893f50111c",
+        "name": "Sample Product",
+        "description": "This is a sample product.",
+        "category": "Electronics",
+        "brand": "BrandX",
+        "price": 99.99,
+        "in_stock": True
+    }
 
-    # Add products
-    products = [
-        {"id": "1", "name": "Product 1", "description": "Description 1", "attributes": {"color": ["red", "blue"]}},
-        {"id": "2", "name": "Product 2", "description": "Description 2", "attributes": {"size": ["S", "M"]}}
-    ]
-    vector_store.add_products(products)
-
-    # Search
-    results = vector_store.search("red product")
+    vector_store.add_products([product])
+    results = vector_store.search("sample product")
     print(results)
-
-    # Update product
-    vector_store.update_product("1", {"id": "1", "name": "Updated Product 1", "description": "Updated Description"})
-
-    # Delete product
-    vector_store.delete_product("2")

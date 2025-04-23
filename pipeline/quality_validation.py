@@ -29,7 +29,10 @@ def validate_results(state: SearchState) -> Union[Dict[str, Any], str]:
     # No results handling
     if not ranked_results:
         logger.warning("No results found")
-        return "handle_no_results"
+        return {
+            **state,
+            "route": "handle_no_results"
+        }
     
     # Check result quality
     quality_issues = []
@@ -116,14 +119,22 @@ def validate_results(state: SearchState) -> Union[Dict[str, Any], str]:
         "result_count": len(ranked_results),
         "quality_check_timestamp": "timestamp_here"
     }
+
+    print(state)
     
     # Route to appropriate handler if there are quality issues
     if quality_issues:
         logger.info(f"Quality issues detected: {quality_issues}")
-        return "handle_quality_issues"
+        return {
+            **state,
+            "route": "handle_quality_issues"
+        }
     
     logger.info("Results quality validation passed")
-    return "build_response"
+    return {
+        **state,
+        "route": "build_response"
+    }
 
 def handle_no_results(state: SearchState) -> SearchState:
     """

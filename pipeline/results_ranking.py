@@ -38,7 +38,7 @@ def rank_results(state: SearchState) -> SearchState:
         }
     
     # Limit to top 5 for LLM processing to reduce costs
-    top_results = retrieval_results[:5]
+    top_results = retrieval_results[:7]
     
     # Create the chain
     chain = RESULTS_RANKING_PROMPT | get_llm()
@@ -56,10 +56,15 @@ def rank_results(state: SearchState) -> SearchState:
             default_response="[]"  # Fallback to empty rankings
         )
         
-        logger.debug(f"Raw ranking result: {ranking_text}")
+        logger.info(f"Raw ranking result: {ranking_text}")
         
         # Parse rankings
         try:
+
+            # if start with ```json and end with ```, remove it
+            if ranking_text.startswith("```json") and ranking_text.endswith("```"):
+                ranking_text = ranking_text[7:-3].strip()
+
             rankings = json.loads(ranking_text)
             
             # Create ranked results by mapping rankings to full product data
