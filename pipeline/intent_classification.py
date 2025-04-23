@@ -24,7 +24,10 @@ def classify_intent(state: SearchState) -> Union[Dict[str, Any], str]:
     # Check if input validation passed
     if state.get("input_validation_error"):
         logger.info("Skipping intent classification due to validation error")
-        return "handle_validation_error"
+        return {
+            **state,
+            "route": "handle_validation_error"
+        }
     
     query = state["query"]
     logger.info(f"Classifying intent for query: {query}")
