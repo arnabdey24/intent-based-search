@@ -80,7 +80,7 @@ async def root():
     """Root endpoint."""
     return {"message": "Intent-Based Search API"}
 
-@app.post("ai/search", response_model=SearchResponse)
+@app.post("/ai/search", response_model=SearchResponse)
 async def search(
     request: SearchRequest,
     metadata: Dict[str, Any] = Depends(get_request_metadata)
@@ -125,7 +125,7 @@ async def search(
         logger.error(f"Search error: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.get("ai/preferences/{user_id}", response_model=Dict[str, Any])
+@app.get("/ai/preferences/{user_id}", response_model=Dict[str, Any])
 async def get_preferences(user_id: str):
     """
     Get preferences for a user.
@@ -144,7 +144,7 @@ async def get_preferences(user_id: str):
         logger.error(f"Error getting preferences: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.put("ai/preferences/{user_id}", response_model=Dict[str, Any])
+@app.put("/ai/preferences/{user_id}", response_model=Dict[str, Any])
 async def update_preferences(user_id: str, preferences: UserPreferencesRequest):
     """
     Update preferences for a user.
@@ -170,7 +170,7 @@ async def update_preferences(user_id: str, preferences: UserPreferencesRequest):
         logger.error(f"Error updating preferences: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.delete("ai/session/{session_id}")
+@app.delete("/ai/session/{session_id}")
 async def clear_session(session_id: str):
     """
     Clear a conversation session.
@@ -189,7 +189,7 @@ async def clear_session(session_id: str):
         logger.error(f"Error clearing session: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.get("ai/health")
+@app.get("/ai/health")
 async def health_check():
     """
     Health check endpoint.
@@ -215,7 +215,7 @@ async def health_check():
             "timestamp": time.time()
         }
 
-@app.get("ai/metrics")
+@app.get("/ai/metrics")
 async def get_metrics():
     """
     Get system metrics.
@@ -233,7 +233,7 @@ async def get_metrics():
         raise HTTPException(status_code=500, detail=str(e))
 
 # Feedback endpoint for improving search quality
-@app.post("ai/feedback")
+@app.post("/ai/feedback")
 async def submit_feedback(
     request_id: str,
     rating: int = Query(..., ge=1, le=5, description="Rating from 1-5"),
