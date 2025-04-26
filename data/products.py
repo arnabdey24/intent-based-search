@@ -56,8 +56,7 @@ class ProductDataManager:
                 sa.Column('price', sa.Float),
                 sa.Column('category', sa.String(100)),
                 sa.Column('brand', sa.String(100)),
-                sa.Column('attributes', sa.JSON),
-                sa.Column('in_stock', sa.Boolean, default=True),
+                sa.Column('stock', sa.Boolean, default=True),
                 sa.Column('created_at', sa.DateTime, server_default=sa.func.now()),
                 sa.Column('updated_at', sa.DateTime, onupdate=sa.func.now())
             )
@@ -192,7 +191,7 @@ class ProductDataManager:
                 # Extract attributes for proper column mapping
                 attributes = {}
                 for key, value in list(product.items()):
-                    if key not in ['id', 'name', 'description', 'price', 'category', 'brand', 'in_stock', 'created_at',
+                    if key not in ['id', 'name', 'description', 'price', 'category', 'brand', 'stock', 'created_at',
                                    'updated_at']:
                         attributes[key] = value
                         product.pop(key)
@@ -254,7 +253,7 @@ class ProductDataManager:
                 # Extract attributes for proper column mapping
                 attributes = {}
                 for key, value in list(updated_product.items()):
-                    if key not in ['id', 'name', 'description', 'price', 'category', 'brand', 'in_stock', 'created_at',
+                    if key not in ['id', 'name', 'description', 'price', 'category', 'brand', 'stock', 'created_at',
                                    'updated_at']:
                         attributes[key] = value
                         updated_product.pop(key)
@@ -673,7 +672,7 @@ class ProductDataManager:
                     # Extract attributes for proper column mapping
                     attributes = {}
                     for key, value in list(product.items()):
-                        if key not in ['id', 'name', 'description', 'price', 'category', 'brand', 'in_stock',
+                        if key not in ['id', 'name', 'description', 'price', 'category', 'brand', 'stock',
                                        'created_at', 'updated_at']:
                             attributes[key] = value
                             product.pop(key)

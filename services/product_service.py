@@ -65,14 +65,19 @@ class ProductService:
             logger.error(f"Error deleting product {product_id}: {str(e)}")
             return False
 
-    async def verify_sync(self) -> Dict[str, Any]:
+    def verify_sync(self) -> Dict[str, Any]:
         """Verify synchronization between databases and fix inconsistencies."""
         # Get all products from primary database
         db_products = self.db_manager.get_all_products()
         db_product_ids = {p["id"] for p in db_products}
 
         # Get count from vector database
-        vector_db_count = self.vector_db
+        vector_db_count = self.vector_db.get_count()
+
+        # Get all product IDs from vector database
+        print(f"Products found: {len(db_products)}")
+
+        print(f"Vector DB count: {vector_db_count}")
 
         results = {
             "primary_db_count": len(db_products),
@@ -98,5 +103,5 @@ import asyncio
 if __name__ == '__main__':
 
     p = ProductService()
-    asyncio.run(p.verify_sync())
+    p.verify_sync()
 

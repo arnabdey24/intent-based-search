@@ -127,6 +127,10 @@ class VectorStore:
                         payload=product
                     )
                 )
+                print(f"Generated point for product {product['id']}")
+
+
+            print(f"Adding {len(points)} products to Qdrant collection")
 
             # Add points to collection
             self.client.upsert(
