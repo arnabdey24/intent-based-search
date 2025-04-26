@@ -205,7 +205,7 @@ if __name__ == "__main__":
     # Test queries including edge cases to test guardrails
     test_queries = [
         # Standard queries
-        "I need running shoes under $200",
+        "I need canon camera under $2000",
         #"Do you have AirPods Pro in stock?",
         #"What's better, Samsung or iPhone for battery life?",
         

@@ -55,3 +55,8 @@ weaviate-client>=3.22.1
 # Configuration management
 python-dotenv>=1.0.0
 pyyaml>=6.0.0
+
+sentence-transformers>=2.2.2
+huggingface-hub>=0.16.4
+torch>=2.0.0
+hf_xet

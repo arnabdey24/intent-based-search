@@ -3,6 +3,7 @@ LLM setup and utility functions.
 """
 from langchain_google_genai import ChatGoogleGenerativeAI, GoogleGenerativeAIEmbeddings
 from langchain_core.prompts import ChatPromptTemplate
+from langchain_community.embeddings import HuggingFaceEmbeddings
 from typing import Dict, Any
 import logging
 
@@ -28,17 +29,17 @@ def get_llm() -> ChatGoogleGenerativeAI:
         logger.error(f"Failed to initialize LLM: {str(e)}")
         raise
 
-def get_embeddings() -> GoogleGenerativeAIEmbeddings:
+def get_embeddings():
     """
-    Initialize and return the embeddings model.
-    
+    Initialize and return the embeddings model using Hugging Face's all-MiniLM-L6-v2.
+
     Returns:
-        GoogleGenerativeAIEmbeddings: Configured embeddings instance
+        HuggingFaceEmbeddings: Configured embeddings instance
     """
     try:
-        embeddings = GoogleGenerativeAIEmbeddings(
-            model=EMBEDDING_CONFIG["model"],
-            google_api_key=EMBEDDING_CONFIG["api_key"]
+        embeddings = HuggingFaceEmbeddings(
+            model_name="sentence-transformers/all-MiniLM-L6-v2",
+            model_kwargs={'device': 'cpu'}  # Use 'cuda' if you have GPU
         )
         return embeddings
     except Exception as e:

@@ -31,7 +31,7 @@ class VectorStore:
         self.embeddings = get_embeddings()
         self.embedding_generator = EmbeddingGenerator()
         self.collection_name = collection_name or VECTOR_STORE_CONFIG.get("collection_name", "products")
-        self.dimension = VECTOR_STORE_CONFIG.get("dimension", 768)
+        self.dimension = VECTOR_STORE_CONFIG.get("dimension", 384)
 
         # Initialize Qdrant client
         self.client = QdrantClient(
@@ -135,7 +135,8 @@ class VectorStore:
             # Add points to collection
             self.client.upsert(
                 collection_name=self.collection_name,
-                points=points
+                points=points,
+                wait=False
             )
 
             logger.info(f"Added {len(products)} products to Qdrant collection")

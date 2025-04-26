@@ -42,7 +42,7 @@ VECTOR_DB_TYPE = os.environ.get("VECTOR_DB_TYPE", "faiss")
 VECTOR_STORE_CONFIG = {
     "type": VECTOR_DB_TYPE,
     "index_name": os.environ.get("VECTOR_STORE_INDEX", "products"),
-    "dimension": int(os.environ.get("VECTOR_DIMENSION", "768")),
+    "dimension": int(os.environ.get("VECTOR_DIMENSION", "384")),
     "metric": os.environ.get("VECTOR_METRIC", "cosine")
 }
 
@@ -57,7 +57,7 @@ elif VECTOR_DB_TYPE == "qdrant":
         "url": os.environ.get("QDRANT_URL", "http://localhost:6333"),
         "api_key": os.environ.get("QDRANT_API_KEY", ""),
         "collection_name": os.environ.get("QDRANT_COLLECTION", "products"),
-        "dimension": int(os.environ.get("VECTOR_DIMENSION", "768")),
+        "dimension": int(os.environ.get("VECTOR_DIMENSION", "384")),
     })
 elif VECTOR_DB_TYPE == "milvus":
     VECTOR_STORE_CONFIG.update({
