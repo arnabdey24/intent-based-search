@@ -74,10 +74,8 @@ class ProductService:
         # Get count from vector database
         vector_db_count = self.vector_db.get_count()
 
-        # Get all product IDs from vector database
-        print(f"Products found: {len(db_products)}")
-
-        print(f"Vector DB count: {vector_db_count}")
+        print(f"Products found in database: {len(db_products)}")
+        print(f"Products found in vector DB: {vector_db_count}")
 
         results = {
             "primary_db_count": len(db_products),
@@ -89,10 +87,26 @@ class ProductService:
         if len(db_products) == vector_db_count:
             results["sync_status"] = "synchronized"
         else:
-            # Resync all products to ensure consistency
-            self.vector_db.add_products(db_products)
-            results["products_added"] = len(db_products)
+            # Resync all products to ensure consistency, but in batches of 1000
+            total_added = 0
+            batch_size = 1000
+
+            for i in range(0, len(db_products), batch_size):
+                # Get the current batch
+                batch = db_products[i:i+batch_size]
+
+                # Add batch to vector database
+                self.vector_db.add_products(batch)
+
+                # Update count
+                total_added += len(batch)
+
+                # Log progress
+                print(f"Processed batch {i//batch_size + 1}: {len(batch)} products ({total_added}/{len(db_products)} total)")
+
+            results["products_added"] = total_added
             results["sync_status"] = "resynced"
+            print(f"Sync complete: {total_added} products added to vector database")
 
         return results
 
