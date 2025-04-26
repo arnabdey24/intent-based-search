@@ -8,6 +8,7 @@ from pydantic import BaseModel
 import uvicorn
 import time
 import uuid
+import os
 
 from services.search_service import SearchService
 from services.conversation_service import ConversationService
@@ -87,23 +88,39 @@ async def search(
 ):
     """
     Execute a search query.
-    
-    Args:
-        request: Search request object
-        metadata: Request metadata from headers
-        
-    Returns:
-        Search response
     """
+    from services.cache_service import CacheService
+    cache_service = CacheService()
+    use_cache = os.getenv("USE_CACHING", "True").lower() == "true"
     try:
-        # Generate request ID for tracking
         request_id = str(uuid.uuid4())
-        
-        # Log request
         logger.info(f"Search request: ID={request_id}, Query='{request.query}'")
-        
-        # Execute search
         start_time = time.time()
+
+        # 1. Try cache first if enabled
+        if use_cache:
+            try:
+                cache_payload = await cache_service.get_cached_response(
+                    question=request.query,
+                    location=metadata.get("session_id", "")
+                )
+                if cache_payload:
+                    mapped_response = {
+                        "response": cache_payload.get("answer", ""),
+                        "intent": cache_payload.get("intent", ""),
+                        "results": cache_payload.get("results", []),
+                        "query": cache_payload.get("question", ""),
+                        "enhanced_query": cache_payload.get("matched_question", None),
+                        "conversation_aware": False,
+                        "error": None,
+                        "request_id": request_id
+                    }
+                    logger.info(f"Cache hit: ID={request_id}")
+                    return mapped_response
+            except Exception as cache_exc:
+                logger.warning(f"Cache lookup failed: {str(cache_exc)}")
+
+        # 2. If not found in cache, continue with normal search
         result = await search_service.search(
             query=request.query,
             user_id=metadata.get("user_id"),
@@ -111,16 +128,26 @@ async def search(
             enable_conversation=request.enable_conversation,
             enable_personalization=request.enable_personalization
         )
-        
-        # Add request ID to response
         result["request_id"] = request_id
-        
-        # Log completion
         execution_time = time.time() - start_time
         logger.info(f"Search completed: ID={request_id}, Time={execution_time:.2f}s")
-        
+
+        # 3. Enrich cache with the new result (fire and forget) if enabled
+        if use_cache:
+            try:
+                enrich_payload = {
+                    "question": request.query,
+                    "answer": result.get("response"),
+                    "location": metadata.get("session_id", ""),
+                    "product_ids": [item.get("id") for item in result.get("results", []) if item.get("id")],
+                    "results": result.get("results", [])
+                }
+                import asyncio
+                asyncio.create_task(cache_service.enrich(**enrich_payload))
+            except Exception as enrich_exc:
+                logger.warning(f"Cache enrich failed: {str(enrich_exc)}")
+
         return result
-        
     except Exception as e:
         logger.error(f"Search error: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
